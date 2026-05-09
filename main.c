@@ -1,4 +1,11 @@
-/* main.c */
+/* main.c 
+ *
+ * Padrões de Projeto de Programação Paralela aplicados neste código:
+ * 1. Pipeline: Dividimos o fluxo em estágios (Gerador -> Cadastro -> Financeiro -> Logística).
+ * 2. Produtor-Consumidor: Filas circulares intermediárias interligando os estágios.
+ * 3. Thread Pool (Trabalhadores/Workers): Conjuntos predefinidos de threads rodando continuamente para cada estágio.
+ * 4. Monitor Object: Estrutura Fila encapsula o buffer, mutex e variáveis de condição para acesso thread-safe.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -31,6 +38,10 @@ typedef struct {
   int id;
 } Pedido;
 
+/* Padrão 4: Monitor Object
+ * Esta estrutura encapsula os dados (buffer, contadores) e os mecanismos 
+ * de sincronização (mutex e variáveis de condição), garantindo que todas as
+ * operações (push/pop) sejam Thread-Safe. */
 typedef struct {
   Pedido *buffer;
   int capacidade;
@@ -296,6 +307,8 @@ static void *funcao_logistica(void *arg) {
 }
 
 int main(void) {
+  /* Padrão 1 e 2: Pipeline com Produtor-Consumidor.
+   * As filas atuam como buffers intermediários entre os estágios do pipeline. */
   Fila fila_pedidos;
   Fila fila_cadastro_ok;
   Fila fila_financeiro_ok;
@@ -304,6 +317,8 @@ int main(void) {
   fila_init(&fila_cadastro_ok, TAM_FILA);
   fila_init(&fila_financeiro_ok, TAM_FILA);
 
+  /* Padrão 3: Thread Pool / Worker
+   * Arrays alocando múltiplas threads (workers) por função para atuarem em paralelo. */
   pthread_t produtores[NUM_PRODUTORES];
   pthread_t cadastro[THREADS_CADASTRO];
   pthread_t financeiro[THREADS_FINANCEIRO];

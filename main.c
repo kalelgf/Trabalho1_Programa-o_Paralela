@@ -1,11 +1,13 @@
-/* main.c 
+
+/* Grupo: Igor Velmud Bandero e Kalel Gomes de Freitas
  *
  * Padrões de Projeto de Programação Paralela aplicados neste código:
- * 1. Pipeline: Dividimos o fluxo em estágios (Gerador -> Cadastro -> Financeiro -> Logística).
+ * 1. Pipeline: Dividimos o fluxo em estágios (Geração de Pedido -> Validação de Cadastro -> Validação Financeira -> Logística).
  * 2. Produtor-Consumidor: Filas circulares intermediárias interligando os estágios.
  * 3. Thread Pool (Trabalhadores/Workers): Conjuntos predefinidos de threads rodando continuamente para cada estágio.
  * 4. Monitor Object: Estrutura Fila encapsula o buffer, mutex e variáveis de condição para acesso thread-safe.
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -39,9 +41,10 @@ typedef struct {
 } Pedido;
 
 /* Padrão 4: Monitor Object
- * Esta estrutura encapsula os dados (buffer, contadores) e os mecanismos 
+ * Esta estrutura encapsula os dados (buffer, contadores) e os mecanismos
  * de sincronização (mutex e variáveis de condição), garantindo que todas as
  * operações (push/pop) sejam Thread-Safe. */
+
 typedef struct {
   Pedido *buffer;
   int capacidade;

@@ -84,7 +84,7 @@ typedef struct {
   Fila *saida;
 } WorkerArgs;
 
-// Função de log thread-safe para evitar mensagens embaralhadas no console
+// Função de log para evitar mensagens embaralhadas no console
 static void log_msg(const char *fmt, ...) {
   va_list args;
   pthread_mutex_lock(&mutex_log);

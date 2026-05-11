@@ -26,6 +26,7 @@
 #define TAXA_FALHA_FINANCEIRO 10
 #define TAXA_FALHA_LOGISTICA 5
 
+// Definição de tempos para processamento (base + variação) em microsegundos
 #define PRODUTOR_US 20000
 #define PRODUTOR_VAR 30000
 #define CADASTRO_US 40000
@@ -83,6 +84,7 @@ typedef struct {
   Fila *saida;
 } WorkerArgs;
 
+// Função de log thread-safe para evitar mensagens embaralhadas no console
 static void log_msg(const char *fmt, ...) {
   va_list args;
   pthread_mutex_lock(&mutex_log);
@@ -159,6 +161,7 @@ static int fila_pop(Fila *f, Pedido *out) {
   return 1;
 }
 
+// Gerador de números aleatórioos
 static unsigned int next_rand(unsigned int *seed) {
   *seed = (*seed * 1103515245u) + 12345u;
   return *seed;
@@ -169,6 +172,7 @@ static int chance_falha(int taxa, unsigned int *seed) {
   return r < taxa;
 }
 
+// Função para introduzir um atraso artificial na execução das threads
 static void simula_trabalho(unsigned int *seed, int base_us, int variacao_us) {
   int delta = 0;
   if (variacao_us > 0) {
@@ -213,6 +217,8 @@ static void *funcao_produtor(void *arg) {
 /* Worker da etapa de cadastro */
 static void *funcao_cadastro(void *arg) {
   WorkerArgs *a = (WorkerArgs *)arg;
+  /* Cada worker tem uma semente de randomização única baseada no tempo,
+  ID do worker e ID da thread para garantir variação real nas simulações */
   unsigned int seed = (unsigned int)time(NULL) ^
                       (unsigned int)(a->id * 123u) ^
                       (unsigned int)(uintptr_t)pthread_self();
@@ -336,7 +342,7 @@ int main(void) {
 
   int i;
 
-  for (i = 0; i < THREADS_CADASTRO; i++) {
+  for (int i = 0; i < THREADS_CADASTRO; i++) {
     cad_args[i].id = i + 1;
     cad_args[i].entrada = &fila_pedidos;
     cad_args[i].saida = &fila_cadastro_ok;
